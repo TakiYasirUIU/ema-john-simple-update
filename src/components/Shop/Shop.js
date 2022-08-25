@@ -12,39 +12,59 @@ const Shop = () => {
       console.log('product load fist before fetch')
       fetch('products.json')
       .then(res => res.json())
-      .then(data => {
-        setProducts (data);
-        console.log('product loaded')
-    } )  
+      .then(data => setProducts (data)); 
     },[]);
 
-    useEffect(() =>{
-        console.log('local storage first line',products)
+    // useEffect(() =>{
+    //     console.log('local storage first line',products)
+    //     const storedCart = getStoredCart();
+    //     const savedCart = [];
+    //     for(const id in storedCart){
+    //         const addedProduct = products.find(product=>product.id === id);
+    //         if(addedProduct){
+    //             const quantity = storedCart[id];
+    //             addedProduct.quantity = quantity;
+    //             savedCart.push(addedProduct);
+                
+    //         }
+    //         // console.log(addedProduct);
+    //     }
+    //     // console.log('local storage finished')
+    //     setCart(savedCart);
+    // },[products])
+    useEffect (() =>{
         const storedCart = getStoredCart();
         const savedCart = [];
         for(const id in storedCart){
-            const addedProduct = products.find(product=>product.id === id);
+            const addedProduct = products.find(product => product.id === id );
             if(addedProduct){
                 const quantity = storedCart[id];
-                addedProduct.quantity = quantity;
+                addedProduct.quantity =quantity;
                 savedCart.push(addedProduct);
-                
             }
-            // console.log(addedProduct);
         }
-        // console.log('local storage finished')
-        setCart(savedCart);
+        setCart(savedCart)
     },[products])
 
     
     // Add to cart event handler
 
-    const handleAddToCart = (product) =>{
-        console.log(product);
+    const handleAddToCart = (selectedProduct) =>{
+        // console.log(selectedProduct);
         // cart.push(product);
-        const newCart = [...cart, product];
+        let newCart = []
+        const exits = cart.find(product => product.id === selectedProduct);
+        if(!exits){
+            selectedProduct.quantity = 1
+            newCart = [...cart, selectedProduct];
+        }
+        else{
+            const rest = cart.filter(product => product.id !== selectedProduct.id);
+            exits.quantity = exits.quantity + 1;
+            newCart = [...rest,exits]
+        }
         setCart(newCart)
-        addToDb(product.id)
+        addToDb(selectedProduct.id)
     
 
     }
